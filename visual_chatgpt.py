@@ -78,6 +78,13 @@ def seed_everything(seed):
     return seed
 
 
+def get_model_nam():
+    model_name = os.environ.get('MODEL_NAME')
+    if model_name == "":
+        raise ValueError('model not found!')
+    return model_name
+
+
 def prompts(name, description):
     def decorator(func):
         func.name = name
@@ -224,9 +231,8 @@ class Text2Image:
         self.torch_dtype = torch.float16 if 'cuda' in device else torch.float32
         # self.pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5",
         #                                                     torch_dtype=self.torch_dtype)
-        self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
-            "XpucT/Deliberate", controlnet=self.controlnet, safety_checker=None,
-            torch_dtype=self.torch_dtype)
+
+        self.pipe = StableDiffusionPipeline.from_pretrained(get_model_nam(), torch_dtype=self.torch_dtype)
         self.pipe.to(device)
         self.a_prompt = 'best quality, extremely detailed'
         self.n_prompt = 'longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, ' \
@@ -296,14 +302,12 @@ class CannyText2Image:
         self.torch_dtype = torch.float16 if 'cuda' in device else torch.float32
         self.controlnet = ControlNetModel.from_pretrained("fusing/stable-diffusion-v1-5-controlnet-canny",
                                                           torch_dtype=self.torch_dtype)
-        # stable-diffusion-v1-5
+
         # self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
         #     "runwayml/stable-diffusion-v1-5", controlnet=self.controlnet, safety_checker=None,
         #     torch_dtype=self.torch_dtype)
-
-        # XpucT/Deliberate
         self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
-            "XpucT/Deliberate", controlnet=self.controlnet, safety_checker=None,
+            get_model_nam(), controlnet=self.controlnet, safety_checker=None,
             torch_dtype=self.torch_dtype)
 
         self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
@@ -311,7 +315,7 @@ class CannyText2Image:
         self.seed = -1
         self.a_prompt = 'best quality, extremely detailed'
         self.n_prompt = 'longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, ' \
-                            'fewer digits, cropped, worst quality, low quality'
+                        'fewer digits, cropped, worst quality, low quality'
 
     @prompts(name="Generate Image Condition On Canny Image",
              description="useful when you want to generate a new real image from both the user description and a canny image."
@@ -364,14 +368,14 @@ class LineText2Image:
         #     torch_dtype=self.torch_dtype
         # )
         self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
-            "XpucT/Deliberate", controlnet=self.controlnet, safety_checker=None,
+            get_model_nam(), controlnet=self.controlnet, safety_checker=None,
             torch_dtype=self.torch_dtype)
         self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
         self.pipe.to(device)
         self.seed = -1
         self.a_prompt = 'best quality, extremely detailed'
         self.n_prompt = 'longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, ' \
-                            'fewer digits, cropped, worst quality, low quality'
+                        'fewer digits, cropped, worst quality, low quality'
 
     @prompts(name="Generate Image Condition On Line Image",
              description="useful when you want to generate a new real image from both the user description "
@@ -425,14 +429,14 @@ class HedText2Image:
         #     torch_dtype=self.torch_dtype
         # )
         self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
-            "XpucT/Deliberate", controlnet=self.controlnet, safety_checker=None,
+            get_model_nam(), controlnet=self.controlnet, safety_checker=None,
             torch_dtype=self.torch_dtype)
         self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
         self.pipe.to(device)
         self.seed = -1
         self.a_prompt = 'best quality, extremely detailed'
         self.n_prompt = 'longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, ' \
-                            'fewer digits, cropped, worst quality, low quality'
+                        'fewer digits, cropped, worst quality, low quality'
 
     @prompts(name="Generate Image Condition On Soft Hed Boundary Image",
              description="useful when you want to generate a new real image from both the user description "
@@ -486,14 +490,14 @@ class ScribbleText2Image:
         #     torch_dtype=self.torch_dtype
         # )
         self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
-            "XpucT/Deliberate", controlnet=self.controlnet, safety_checker=None,
+            get_model_nam(), controlnet=self.controlnet, safety_checker=None,
             torch_dtype=self.torch_dtype)
         self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
         self.pipe.to(device)
         self.seed = -1
         self.a_prompt = 'best quality, extremely detailed'
         self.n_prompt = 'longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, ' \
-                            'fewer digits, cropped, worst quality, low quality'
+                        'fewer digits, cropped, worst quality, low quality'
 
     @prompts(name="Generate Image Condition On Sketch Image",
              description="useful when you want to generate a new real image from both the user description and "
@@ -543,7 +547,7 @@ class PoseText2Image:
         #     "runwayml/stable-diffusion-v1-5", controlnet=self.controlnet, safety_checker=None,
         #     torch_dtype=self.torch_dtype)
         self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
-            "XpucT/Deliberate", controlnet=self.controlnet, safety_checker=None,
+            get_model_nam(), controlnet=self.controlnet, safety_checker=None,
             torch_dtype=self.torch_dtype)
         self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
         self.pipe.to(device)
@@ -552,7 +556,7 @@ class PoseText2Image:
         self.unconditional_guidance_scale = 9.0
         self.a_prompt = 'best quality, extremely detailed'
         self.n_prompt = 'longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit,' \
-                            ' fewer digits, cropped, worst quality, low quality'
+                        ' fewer digits, cropped, worst quality, low quality'
 
     @prompts(name="Generate Image Condition On Pose Image",
              description="useful when you want to generate a new real image from both the user description "
@@ -653,14 +657,14 @@ class SegText2Image:
         #     "runwayml/stable-diffusion-v1-5", controlnet=self.controlnet, safety_checker=None,
         #     torch_dtype=self.torch_dtype)
         self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
-            "XpucT/Deliberate", controlnet=self.controlnet, safety_checker=None,
+            get_model_nam(), controlnet=self.controlnet, safety_checker=None,
             torch_dtype=self.torch_dtype)
         self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
         self.pipe.to(device)
         self.seed = -1
         self.a_prompt = 'best quality, extremely detailed'
         self.n_prompt = 'longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit,' \
-                            ' fewer digits, cropped, worst quality, low quality'
+                        ' fewer digits, cropped, worst quality, low quality'
 
     @prompts(name="Generate Image Condition On Segmentations",
              description="useful when you want to generate a new real image from both the user description and segmentations. "
@@ -715,14 +719,14 @@ class DepthText2Image:
         #     "runwayml/stable-diffusion-v1-5", controlnet=self.controlnet, safety_checker=None,
         #     torch_dtype=self.torch_dtype)
         self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
-            "XpucT/Deliberate", controlnet=self.controlnet, safety_checker=None,
+            get_model_nam(), controlnet=self.controlnet, safety_checker=None,
             torch_dtype=self.torch_dtype)
         self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
         self.pipe.to(device)
         self.seed = -1
         self.a_prompt = 'best quality, extremely detailed'
         self.n_prompt = 'longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit,' \
-                            ' fewer digits, cropped, worst quality, low quality'
+                        ' fewer digits, cropped, worst quality, low quality'
 
     @prompts(name="Generate Image Condition On Depth",
              description="useful when you want to generate a new real image from both the user description and depth image. "
@@ -788,15 +792,16 @@ class NormalText2Image:
         # self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
         #     "runwayml/stable-diffusion-v1-5", controlnet=self.controlnet, safety_checker=None,
         #     torch_dtype=self.torch_dtype)
+
         self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
-            "XpucT/Deliberate", controlnet=self.controlnet, safety_checker=None,
+            get_model_nam(), controlnet=self.controlnet, safety_checker=None,
             torch_dtype=self.torch_dtype)
         self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
         self.pipe.to(device)
         self.seed = -1
         self.a_prompt = 'best quality, extremely detailed'
         self.n_prompt = 'longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit,' \
-                            ' fewer digits, cropped, worst quality, low quality'
+                        ' fewer digits, cropped, worst quality, low quality'
 
     @prompts(name="Generate Image Condition On Normal Map",
              description="useful when you want to generate a new real image from both the user description and normal map. "
